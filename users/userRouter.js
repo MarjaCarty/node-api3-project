@@ -1,5 +1,6 @@
 const express = require("express");
 const User = require("./userDb");
+const Post = require("../posts/postDb");
 
 const router = express.Router();
 
@@ -15,21 +16,28 @@ router.post("/", validateUser, async (req, res) => {
 
 router.post("/:id/posts", validateUserId, validatePost, async (req, res) => {
   // do your magic!
+  const { id } = req.params;
   try {
-    const newPost = await User.insert(req.body);
+    const newPost = await Post.insert({ ...req.body, user_id: id });
     res.status(201).json(newPost);
-  } catch {
-    res.status(500).json({ message: "There was an error creating post" });
+  } catch (err) {
+    res.status(500).json({
+      message: "There was an error creating post",
+      error: err.message,
+    });
   }
 });
 
 router.get("/", async (req, res) => {
   // do your magic!
   try {
-    const users = await get();
+    const users = await User.get();
     res.status(200).json(users);
-  } catch {
-    res.status(500).json({ message: "There was an error getting user data" });
+  } catch (err) {
+    res.status(500).json({
+      message: "There was an error getting user data",
+      error: err.message,
+    });
   }
 });
 
