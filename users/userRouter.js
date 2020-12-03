@@ -3,32 +3,75 @@ const User = require("./userDb");
 
 const router = express.Router();
 
-router.post("/", (req, res) => {
+router.post("/", validateUser, async (req, res) => {
   // do your magic!
+  try {
+    const newUser = await User.insert(req.body);
+    res.status(201).json(newUser);
+  } catch {
+    res.status(500).json({ message: "There was an error creating user" });
+  }
 });
 
-router.post("/:id/posts", (req, res) => {
+router.post("/:id/posts", validateUserId, validatePost, async (req, res) => {
   // do your magic!
+  try {
+    const newPost = await User.insert(req.body);
+    res.status(201).json(newPost);
+  } catch {
+    res.status(500).json({ message: "There was an error creating post" });
+  }
 });
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   // do your magic!
+  try {
+    const users = await get();
+    res.status(200).json(users);
+  } catch {
+    res.status(500).json({ message: "There was an error getting user data" });
+  }
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", validateUserId, (req, res) => {
   // do your magic!
+  res.status(200).json(req.user);
 });
 
-router.get("/:id/posts", (req, res) => {
+router.get("/:id/posts", validateUserId, async (req, res) => {
   // do your magic!
+  const { id } = req.params;
+  try {
+    const posts = await User.getUserPosts(id);
+    res.status(200).json(posts);
+  } catch {
+    res.status(500).json({ message: "There was an error getting posts" });
+  }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validateUserId, async (req, res) => {
   // do your magic!
+  const { id } = req.params;
+  try {
+    const deletedPost = await User.getById(id);
+    const deletedConfirm = await User.remove(id);
+    res.status(200).json(deletedPost);
+  } catch {
+    res.status(500).json({ message: "User could not be removed" });
+  }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validateUserId, async (req, res) => {
   // do your magic!
+  const { id } = req.params;
+
+  try {
+    const updated = await User.update(id, req.body);
+    const changedUser = await User.getById(id);
+    res.status(200).json(changedUser);
+  } catch {
+    res.status(500).json({ message: "User could not be updated" });
+  }
 });
 
 //custom middleware
